@@ -6,12 +6,24 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-
 const earthquakeLayer = L.layerGroup().addTo(map);
 const USGS_URL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
 const K = 0.15; // regolo la velocita in cui l opacita si modifica
 const UPDATE_INTERVAL = 60 * 1000;  
 const MAX_HOURS = 24;
+
+let minMagnitude = 0;
+
+// Slider magnitudo
+const minMagInput = document.getElementById('minMag');
+const minMagValue = document.getElementById('minMagValue');
+minMagInput.addEventListener('input', () => {
+    minMagnitude = parseFloat(minMagInput.value);
+    minMagValue.textContent = minMagnitude;
+    fetchAndDisplayEarthquakes();
+});
+minMagnitude = parseFloat(minMagInput.value);
+minMagValue.textContent = minMagnitude;
 
 // modifico il colore in base all eta del terremoto
 function getColorByAge(hours) {
@@ -36,13 +48,12 @@ function fetchAndDisplayEarthquakes() {
                 const time = terremoto.properties.time;
                 const eta = (now - time) / (1000 * 60 * 60); // ore trascorse al ms
                 if (eta > MAX_HOURS) continue; 
+                if (mag < minMagnitude) continue; // FILTRO MAGNITUDO
 
-                // opacità esponenziale + colori rosso (nuovo) e giallo (vecchio)
                 const opacity = Math.max(0.2, Math.exp(-K * eta));
                 const color = getColorByAge(eta);
 
-            
-                const circle = L.circle([lat, lng], {
+                L.circle([lat, lng], {
                     color: color,
                     fillColor: color,
                     fillOpacity: opacity,
