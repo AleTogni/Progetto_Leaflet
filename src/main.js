@@ -7,15 +7,6 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 
-const circle = L.circle([45.605811462904406, 10.212098934035723], {
-    color: 'red',
-    fillColor: '#f03',
-    fillOpacity: 0.1,
-    radius: 500
-}).addTo(map);
-circle.bindPopup("Concesio");
-
-
 const earthquakeLayer = L.layerGroup().addTo(map);
 const USGS_URL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
 const K = 0.15; // regolo la velocita in cui l opacita si modifica
@@ -43,12 +34,12 @@ function fetchAndDisplayEarthquakes() {
                 const mag = terremoto.properties.mag;
                 const place = terremoto.properties.place;
                 const time = terremoto.properties.time;
-                const deltaT = (now - time) / (1000 * 60 * 60); // ore trascorse al ms
-                if (deltaT > MAX_HOURS) continue; 
+                const eta = (now - time) / (1000 * 60 * 60); // ore trascorse al ms
+                if (eta > MAX_HOURS) continue; 
 
                 // opacità esponenziale + colori rosso (nuovo) e giallo (vecchio)
-                const opacity = Math.max(0.2, Math.exp(-K * deltaT));
-                const color = getColorByAge(deltaT);
+                const opacity = Math.max(0.2, Math.exp(-K * eta));
+                const color = getColorByAge(eta);
 
             
                 const circle = L.circle([lat, lng], {
@@ -60,8 +51,8 @@ function fetchAndDisplayEarthquakes() {
                 .bindPopup(
                     `<b>Magnitudo:</b> ${mag}<br>
                     <b>Luogo:</b> ${place}<br>
-                    <b>Ora:</b> ${new Date(time).toLocaleString()}<br>
-                    <b>Età:</b> ${deltaT.toFixed(2)} ore`
+                    <b>Ora:</b> ${new Date(time).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}<br>
+                    <b>Età:</b> ${eta.toFixed(2)} ore`
                 )
                 .addTo(earthquakeLayer);
             }
