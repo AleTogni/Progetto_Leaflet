@@ -14,7 +14,7 @@ const MAX_HOURS = 24;
 
 let minMagnitude = 0;
 
-// slider magnitudo
+// slider scelta magnitudo
 const minMagInput = document.getElementById('minMag');
 const minMagValue = document.getElementById('minMagValue');
 minMagInput.addEventListener('input', () => {
@@ -25,7 +25,7 @@ minMagInput.addEventListener('input', () => {
 minMagnitude = parseFloat(minMagInput.value);
 minMagValue.textContent = minMagnitude;
 
-// Sidebar elements
+// elementi della sidebar
 const sidebar = document.getElementById('sidebar');
 const sidebarContent = document.getElementById('sidebar-content');
 const closeSidebar = document.getElementById('closeSidebar');
@@ -33,8 +33,7 @@ closeSidebar.addEventListener('click', () => {
     sidebar.style.display = 'none';
 });
 
-
-// modifico il colore in base all eta del terremoto
+// colore in base all'età del terremoto
 function getColorByAge(hours) {
     const r = 255;
     const g = Math.min(255, Math.round((hours / MAX_HOURS) * 255));
@@ -73,19 +72,17 @@ function fetchAndDisplayEarthquakes() {
                 })
                 .addTo(earthquakeLayer);
 
-
-                // sidebar con dettagli terremoti + link a usgs
+                // sidebar con info dei terremoti
                 circle.on('click', () => {
+
                     sidebarContent.innerHTML = `
-                        <h2 style="margin-top:0;">Dettagli Terremoto</h2>
+                        <h2 style="margin-top:0;">${terremoto.properties.title}</h2>
                         <b>Magnitudo:</b> ${mag}<br>
                         <b>Luogo:</b> ${place}<br>
                         <b>Data/Ora:</b> ${new Date(time).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}<br>
                         <b>Età:</b> ${eta.toFixed(2)} ore<br>
                         <b>Profondità:</b> ${depth} km<br>
                         <b>Coordinate:</b> ${lat.toFixed(3)}, ${lng.toFixed(3)}<br>
-                        <b>Link USGS:</b> <a href="${urlUSGS}" target="_blank">Scheda evento</a><br>
-                        <div style="margin:12px 0;">
                     `;
                     sidebar.style.display = 'block';
                 });
